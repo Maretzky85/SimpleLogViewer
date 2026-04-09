@@ -1,0 +1,14 @@
+{
+  "name": "logviewer",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "postinstall": "npm --prefix log-view-back install && npm --prefix log-view-front install",
+    "dev": "USE_MOCK=true concurrently -n api,web -c blue,green \"npm --prefix log-view-back run start:dev\" \"npm --prefix log-view-front run dev\"",
+    "build": "npm --prefix log-view-back run build && npm --prefix log-view-front run build",
+    "test": "npm --prefix log-view-back run test && npm --prefix log-view-front run test",
+    "lint": "npm --prefix log-view-back run lint && npm --prefix log-view-front run lint"
+  }
+}

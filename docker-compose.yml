@@ -1,0 +1,32 @@
+services:
+  api:
+    build: ./log-view-back
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ${HOST_LOG_PATH:-./traefik.log}:/logs/traefik.log:ro
+    networks:
+      - internal
+
+  web:
+    build: ./log-view-front
+    restart: unless-stopped
+    depends_on:
+      - api
+    networks:
+      - internal
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.logviewer.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.logviewer.entrypoints=http,https"
+      - "traefik.http.routers.logviewer.tls=true"
+      - "traefik.http.routers.logviewer.tls.certresolver=cloudflare"
+      - "traefik.http.routers.logviewer.tls.domains[0].main=${APP_HOST}"
+      - "traefik.http.services.logviewer.loadbalancer.server.port=80"
+
+networks:
+  internal:
+  proxy:
+    external: true
